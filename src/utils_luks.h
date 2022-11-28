@@ -31,6 +31,8 @@ bool isLUKS1(const char *type);
 
 bool isLUKS2(const char *type);
 
+bool isOPAL(const char *type);
+
 int verify_passphrase(int def);
 
 void set_activation_flags(uint32_t *flags);
