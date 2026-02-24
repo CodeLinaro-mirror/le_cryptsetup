@@ -102,6 +102,7 @@ required_headers = [
     'sys/mman.h',
     'sys/statvfs.h',
     'sys/sysmacros.h',
+    'sys/utsname.h',
     'uchar.h',
     'unistd.h',
 ]
