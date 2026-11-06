@@ -641,7 +641,7 @@ int LUKS2_disk_hdr_read(struct crypt_device *cd, struct luks2_hdr *hdr,
 			struct device *device, int do_recovery, int do_blkprobe)
 {
 	enum { HDR_OK, HDR_OBSOLETE, HDR_FAIL, HDR_FAIL_IO } state_hdr1, state_hdr2;
-	struct luks2_hdr_disk hdr_disk1, hdr_disk2;
+	struct luks2_hdr_disk hdr_disk1 = {}, hdr_disk2 = {};
 	char *json_area1 = NULL, *json_area2 = NULL;
 	json_object *jobj_hdr1 = NULL, *jobj_hdr2 = NULL;
 	unsigned int i;
@@ -739,6 +739,11 @@ int LUKS2_disk_hdr_read(struct crypt_device *cd, struct luks2_hdr *hdr,
 			}
 			if (r)
 				log_dbg(cd, "Secondary LUKS2 header recovery failed.");
+		} else {
+			/* regenerate salt even when not doing recovery */
+			r = crypt_random_get(cd, (char*)hdr_disk2.salt, sizeof(hdr_disk2.salt), CRYPT_RND_SALT);
+			if (r)
+				log_dbg(cd, "Cannot generate header salt.");
 		}
 	} else if (state_hdr1 != HDR_OK && state_hdr2 == HDR_OK) {
 		log_dbg(cd, "Primary LUKS2 header requires recovery.");
@@ -760,6 +765,11 @@ int LUKS2_disk_hdr_read(struct crypt_device *cd, struct luks2_hdr *hdr,
 			}
 			if (r)
 				log_dbg(cd, "Primary LUKS2 header recovery failed.");
+		} else {
+			/* regenerate salt even when not doing recovery */
+			r = crypt_random_get(cd, (char*)hdr_disk1.salt, sizeof(hdr_disk1.salt), CRYPT_RND_SALT);
+			if (r)
+				log_dbg(cd, "Cannot generate header salt.");
 		}
 	}
 
